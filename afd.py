@@ -1,86 +1,6 @@
 import re
 
 
-# class Vertex:
-#     @classmethod
-#     def is_symbol(cls, symbol) -> bool:
-#         if isinstance(symbol, str) and len(symbol) == 1 and bool(re.search('[0-9a-zA-Z]', symbol)):
-#             return True
-#         else:
-#             return False
-#
-#     @classmethod
-#     def _symbol(cls, symbol) -> str:
-#         return symbol if cls.is_symbol(symbol) else ''
-#
-#     @classmethod
-#     def is_node(cls, node) -> bool:
-#         return True if isinstance(node, Node) else False
-#
-#     @classmethod
-#     def _node(cls, node):
-#         return node if cls.is_node(node) else None
-#
-#     @classmethod
-#     def is_vertex(cls, vertex: dict) -> bool:
-#         if isinstance(vertex, dict) and len(vertex) == 1:
-#             key, value = tuple(vertex.items())[0]
-#             return True if cls.is_symbol(key) and cls.is_node(value) else False
-#         else:
-#             return False
-#
-#     @classmethod
-#     def _vertex(cls, vertex) -> tuple:
-#         return tuple(vertex.items())[0] if cls.is_vertex(vertex) else (None, None)
-#
-#     def __init__(self, *args, **kwargs):
-#         self.__symbol, self.__node = None, None
-#
-#         if args:
-#             for item in args:
-#                 if self.is_symbol(item):
-#                     self.__symbol = self._symbol(item)
-#                 if self.is_node(item):
-#                     self.__node = self._node(item)
-#
-#         if kwargs:
-#             if 'symbol' in kwargs and self.is_symbol(kwargs['symbol']):
-#                 self.__symbol = kwargs['symbol']
-#
-#             if 'node' in kwargs and self.is_node(kwargs['node']):
-#                 self.__node = kwargs['node']
-#
-#             if self.is_vertex(kwargs):
-#                 self.__symbol, self.__node = self._vertex(kwargs)
-#
-#     @property
-#     def symbol(self) -> str:
-#         return self.__symbol
-#
-#     @symbol.setter
-#     def symbol(self, symbol):
-#         self.__symbol = self._symbol(symbol)
-#
-#     @property
-#     def node(self):
-#         return self.__node
-#
-#     @node.setter
-#     def node(self, node):
-#         self.__node = self._node(node)
-#
-#     @property
-#     def vertex(self) -> dict:
-#         return {self.__symbol: self.__node} if self.__symbol and self.__node else dict()
-#
-#     @vertex.setter
-#     def vertex(self, vertex: dict):
-#         self.__symbol, self.__node = self._vertex(vertex) if self.is_vertex(vertex) else (None, None)
-#
-#     def __str__(self) -> str:
-#         return f"'{self.__symbol}': {self.__node.name}" if self.__symbol and self.__node else ''
-
-
 class Node:
     @classmethod
     def is_name(cls, name) -> bool:
@@ -219,15 +139,12 @@ class Bot:
         pass
 
     def extended_transition(self, word: list) -> tuple:
-        # try:
-            iterator, result, word = self.__nodes['q0'], list(), list(word)
-            for i in word:
-                next_node = self.nodes[iterator.transition(i)]
-                result.append(f'd({iterator.name}, \'{i}\') = {next_node.name if next_node else None}')
-                iterator = next_node if next_node else iterator
-            return result, iterator.status
-        # except:
-        #     pass  # ¿Qué se le puede pasar como entrada?
+        iterator, result, word = self.__nodes['q0'], list(), list(word)
+        for i in word:
+            next_node = self.nodes[iterator.transition(i)]
+            result.append(f'd({iterator.name}, \'{i}\') = {next_node.name if next_node else None}')
+            iterator = next_node if next_node else iterator
+        return result, iterator.status
 
     def __str__(self) -> str:
         pass
