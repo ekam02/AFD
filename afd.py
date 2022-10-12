@@ -35,7 +35,7 @@ class Node:
         return {symbol: name for symbol, name in edges.items() if cls.is_edge({symbol: name})}
 
     def __init__(self, *args, **kwargs):
-        self.__name, self.__status, self.__edges = '', False, {}
+        self.__name, self.__status, self.__main, self.__edges = '', False, False, {}
 
         if args:
             if len(args) > 0:
@@ -45,7 +45,10 @@ class Node:
                 self.__status = self.is_status(args[1])
 
             if len(args) > 2:
-                self.__edges = self._edges(args[2])
+                self.__main = self.is_status(args[2])
+
+            if len(args) > 3:
+                self.__edges = self._edges(args[3])
 
         if kwargs:
             if 'name' in kwargs:
@@ -54,6 +57,9 @@ class Node:
             if 'status' in kwargs:
                 self.__status = self.is_status(kwargs['status'])
 
+            if 'main' in kwargs:
+                self.__status = self.is_status(kwargs['main'])
+
             if 'edges' in kwargs:
                 self.__edges = self._edges(kwargs['edges'])
 
@@ -61,7 +67,7 @@ class Node:
 
     @property
     def name(self) -> str:
-        return self.__name
+        return f'*{self.__name}' if self.__status else f'*{self.__name}'
 
     @name.setter
     def name(self, name: str):
@@ -74,6 +80,14 @@ class Node:
     @status.setter
     def status(self, status: bool):
         self.__status = self.is_status(status)
+
+    @property
+    def main(self) -> bool:
+        return self.__main
+
+    @main.setter
+    def main(self, main):
+        self.__main = self.is_status(main)
 
     @property
     def edges(self) -> dict:
@@ -94,7 +108,7 @@ class Node:
         return {'name': self.__name, 'status': self.__status, 'edges': self.__edges}
 
     def __str__(self) -> str:
-        return self.__name
+        return self.name
 
 
 class Bot:
