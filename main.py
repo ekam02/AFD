@@ -5,10 +5,6 @@ from afd import *
 app = Flask(__name__)
 
 
-# bot = None
-#
-#
-# def test():
 bot = Bot(5, 'bacd')
 bot.nodes['q0'].status = 1
 bot.nodes['q2'].status = 1
@@ -31,13 +27,6 @@ def test():
     word = list(request.args.get('word', ''))
     steps, validation = bot.extended_transition(word)
     return render_template('output.html', steps=steps, validation=validation)
-
-    # if request.method == 'POST':
-    #     word = request.form.get('word')
-    #     steps, validation = bot.extended_transition(word)
-    #     return render_template('output.html', steps=steps, validation=validation)
-    # if request.method == 'GET':
-    #     return render_template('input.html')
 
 
 if __name__ == '__main__':
