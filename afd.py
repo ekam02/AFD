@@ -62,7 +62,7 @@ class Node:
                 self.__status = self.is_status(kwargs['status'])
 
             if 'main' in kwargs:
-                self.__status = self.is_status(kwargs['main'])
+                self.__main = self.is_status(kwargs['main'])
 
             if 'edges' in kwargs:
                 self.__edges = self._edges(kwargs['edges'])
@@ -71,7 +71,7 @@ class Node:
 
     @property
     def name(self) -> str:
-        return f'*{self.__name}' if self.__status else f'*{self.__name}'
+        return f'*{self.__name}' if self.__status else self.__name
 
     @name.setter
     def name(self, name: str):
