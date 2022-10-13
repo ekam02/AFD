@@ -1,11 +1,6 @@
 import re
 
 
-# class MultipleStartNodes(Exception):
-#     def __init__(self, message):
-#         self.message = message
-
-
 class Node:
     @classmethod
     def is_name(cls, name) -> bool:
@@ -137,14 +132,6 @@ class Bot:
             states.append(Node('q0', main=1))
         return states
 
-    # @staticmethod
-    # def assert_main(foo):
-    #     def func():
-    #         foo()
-    #         if sum(map(lambda n: int(n.status), foo())) != 1:
-    #             raise MultipleStartNodes('More than one initial node exists.')
-    #     return func
-
     def __init__(self, *args, **kwargs):
         self.__nodes, self.__alphabet = [], []
 
@@ -176,7 +163,7 @@ class Bot:
 
     @property
     def initial_state(self):
-        return list(filter(lambda n: n if n.main else None, self.__nodes))[0].name
+        return f'->{list(filter(lambda n: n if n.main else None, self.__nodes))[0].name}'
 
     @property
     def final_states(self) -> list:
