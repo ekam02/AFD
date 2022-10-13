@@ -1,5 +1,9 @@
 import re
-from random import Random
+
+
+# class MultipleStartNodes(Exception):
+#     def __init__(self, message):
+#         self.message = message
 
 
 class Node:
@@ -121,7 +125,25 @@ class Bot:
 
     @classmethod
     def make_nodes(cls, nodes: int) -> list:
-        return [Node(f'q{i}') for i in range(nodes)] if nodes > 1 else [Node('q0')]
+        states = []
+        if nodes > 1:
+            for i in range(nodes):
+                name = f'q{i}'
+                if name == 'q0':
+                    states.append(Node(name, main=1))
+                else:
+                    states.append(Node(name))
+        else:
+            states.append(Node('q0', main=1))
+        return states
+
+    # @staticmethod
+    # def assert_main(foo):
+    #     def func():
+    #         foo()
+    #         if sum(map(lambda n: int(n.status), foo())) != 1:
+    #             raise MultipleStartNodes('More than one initial node exists.')
+    #     return func
 
     def __init__(self, *args, **kwargs):
         self.__nodes, self.__alphabet = [], []
@@ -153,8 +175,8 @@ class Bot:
         self.__alphabet = self.regex(list(alphabet))
 
     @property
-    def initial_state(self) -> str:
-        return self.__nodes[0].name if self.__nodes else ''
+    def initial_state(self):
+        return list(filter(lambda n: n if n.main else None, self.__nodes))[0].name
 
     @property
     def final_states(self) -> list:
