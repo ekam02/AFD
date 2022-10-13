@@ -34,7 +34,7 @@ class Node:
         return {symbol: name for symbol, name in edges.items() if cls.is_edge({symbol: name})}
 
     def __init__(self, *args, **kwargs):
-        self.__name, self.__status, self.__edges = '', False, {}
+        self.__name, self.__status, self.__main, self.__edges = '', False, False, {}
 
         if args:
             if len(args) > 0:
@@ -44,7 +44,10 @@ class Node:
                 self.__status = self.is_status(args[1])
 
             if len(args) > 2:
-                self.__edges = self._edges(args[2])
+                self.__main = self.is_status(args[2])
+
+            if len(args) > 3:
+                self.__edges = self._edges(args[3])
 
         if kwargs:
             if 'name' in kwargs:
@@ -53,6 +56,9 @@ class Node:
             if 'status' in kwargs:
                 self.__status = self.is_status(kwargs['status'])
 
+            if 'main' in kwargs:
+                self.__main = self.is_status(kwargs['main'])
+
             if 'edges' in kwargs:
                 self.__edges = self._edges(kwargs['edges'])
 
@@ -60,7 +66,7 @@ class Node:
 
     @property
     def name(self) -> str:
-        return self.__name
+        return f'*{self.__name}' if self.__status else self.__name
 
     @name.setter
     def name(self, name: str):
@@ -73,6 +79,14 @@ class Node:
     @status.setter
     def status(self, status: bool):
         self.__status = self.is_status(status)
+
+    @property
+    def main(self) -> bool:
+        return self.__main
+
+    @main.setter
+    def main(self, main):
+        self.__main = self.is_status(main)
 
     @property
     def edges(self) -> dict:
@@ -93,7 +107,7 @@ class Node:
         return {'name': self.__name, 'status': self.__status, 'edges': self.__edges}
 
     def __str__(self) -> str:
-        return self.__name
+        return self.name
 
 
 class Bot:
@@ -105,11 +119,21 @@ class Bot:
         return list(alphabet.keys())
 
     @classmethod
-    def make_nodes(cls, nodes: int) -> dict:
-        return {f'q{i}': Node(f'q{i}') for i in range(nodes)} if nodes > 1 else {'q0': Node('q0')}
+    def make_nodes(cls, nodes: int) -> list:
+        states = []
+        if nodes > 1:
+            for i in range(nodes):
+                name = f'q{i}'
+                if name == 'q0':
+                    states.append(Node(name, main=1))
+                else:
+                    states.append(Node(name))
+        else:
+            states.append(Node('q0', main=1))
+        return states
 
     def __init__(self, *args, **kwargs):
-        self.__nodes, self.__alphabet = {}, {}
+        self.__nodes, self.__alphabet = [], []
 
         if args:
             if len(args) > 0 and isinstance(args[0], int):
@@ -126,7 +150,7 @@ class Bot:
                 self.__alphabet = self.regex(list(kwargs['alphabet']))
 
     @property
-    def nodes(self) -> dict:
+    def nodes(self) -> list:
         return self.__nodes
 
     @property
@@ -138,24 +162,24 @@ class Bot:
         self.__alphabet = self.regex(list(alphabet))
 
     @property
-    def initial_state(self) -> str:
-        return self.__nodes['q0'].name if self.__nodes else ''
+    def initial_state(self):
+        return f'->{list(filter(lambda n: n if n.main else None, self.__nodes))[0].name}'
 
     @property
-    def final_states(self) -> dict:
-        return [node.name for key, node in self.__nodes.items() if node.status] if self.__nodes else {}
+    def final_states(self) -> list:
+        return [node.name for node in self.__nodes if node.status] if self.__nodes else []
 
     @property
     def info(self) -> dict:
-        return {'alphabet': self.__alphabet, 'nodes': [node.info for name, node in self.__nodes.items()]}
+        return {'alphabet': self.__alphabet, 'nodes': [node.info for node in self.__nodes]}
 
     def extended_transition(self, word: list) -> tuple:
-        iterator, result, word = self.__nodes['q0'], list(), list(word)
+        iterator, result, word = self.__nodes[0], list(), list(word)
         for i in word:
-            next_node = self.nodes[iterator.transition(i)]
+            next_node = iterator.transition(i)
             result.append(f"d({iterator.name}, '{i}') = {next_node.name if next_node else None}")
             iterator = next_node if next_node else iterator
         return result, iterator.status
 
     def __str__(self) -> str:
-        return f"alphabet: {self.__alphabet}, nodes: {[node for node in self.__nodes]}"
+        return f"alphabet: {self.__alphabet}, nodes: {[node.name for node in self.__nodes]}"
