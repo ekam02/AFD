@@ -1,1 +1,2 @@
 # AFD
+Autómata Finito Determinista
